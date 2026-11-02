@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RQ | M. Riyadussolikhin — Noir Portfolio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fontsource-courier-prime@4.5.0/index.css">
+    <style>
+        /* ============================================
+           1. CSS VARIABLES - TEMA MONOKROM NOIR
+           ============================================ */
+        :root {
+            --bg-color: #050505;
+            --bg-secondary: #0a0a0a;
+            --text-color: #e8e8e8;
+            --text-muted: #888888;
+            --accent-color: #ffffff;
+            --accent-glow: rgba(255, 255, 255, 0.4);
+            --nav-bg: rgba(5, 5, 5, 0.75);
+            --card-bg: #0f0f0f;
+            --card-hover: #161616;
+            --border-color: #2a2a2a;
+            --border-hover: #444444;
+            --particle-color: rgba(255, 255, 255, 0.3);
+            --success-color: #00e5ff;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f2f2f2;
+            --bg-secondary: #e8e8e8;
+            --text-color: #111111;
+            --text-muted: #555555;
+            --accent-color: #000000;
+            --accent-glow: rgba(0, 0, 0, 0.2);
+            --nav-bg: rgba(242, 242, 242, 0.75);
+            --card-bg: #ffffff;
+            --card-hover: #f8f8f8;
+            --border-color: #d5d5d5;
+            --border-hover: #999999;
+            --particle-color: rgba(0, 0, 0, 0.15);
+            --success-color: #0066ff;
+        }
+
+        /* ============================================
+           2. RESET & BASE
+           ============================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            transition: background-color 0.6s ease, color 0.6s ease;
+            overflow-x: hidden;
+            line-height: 1.7;
+            cursor: none;
+        }
+
+        ::selection {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        /* Scrollbar Custom */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--border-color); 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+
+        /* ============================================
+           3. PARTICLE BACKGROUND CANVAS
+           ============================================ */
+        #particleCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ============================================
+           4. CUSTOM CURSOR TRAIL
+           ============================================ */
+        .cursor-dot {
+            width: 6px; height: 6px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            position: fixed;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s;
+            mix-blend-mode: difference;
+        }
+        
+        .cursor-outline {
+            width: 36px; height: 36px;
+            border: 1px solid var(--text-muted);
+            border-radius: 50%;
+            position: fixed;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease;
+        }
+
+        /* ============================================
+           5. GLASSMORPHISM NAVBAR
+           ============================================ */
+        nav {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            padding: 18px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--nav-bg);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.4s ease;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: 5px;
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px; left: 0;
+            width: 0; height: 1px;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover { color: var(--accent-color); }
+        .nav-links a:hover::after { width: 100%; }
+
+        .nav-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+        }
+
+        .hamburger span {
+            width: 25px; height: 2px;
+            background: var(--accent-color);
+            transition: all 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        /* ============================================
+           6. HERO SECTION
+           ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 20px 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Image Carousel */
+        .hero-carousel {
+            width: 240px; height: 240px;
+            position: relative;
+            margin-bottom: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 0 60px var(--accent-glow);
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeInUp 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation-delay: 0.2s;
+        }
+
+        .carousel-img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            filter: grayscale(100%);
+            opacity: 0;
+            transition: opacity 1.2s ease, filter 0.6s ease;
+        }
+
+        .carousel-img.active { opacity: 1; }
+        .hero-carousel:hover .carousel-img { filter: grayscale(0%); }
+
+        /* Carousel Indicators */
+        .carousel-indicators {
+            position: absolute;
+            bottom: 15px; left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .indicator {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transition: all 0.3s;
+        }
+
+        .indicator.active {
+            background: var(--accent-color);
+            width: 20px;
+            border-radius: 3px;
+        }
+
+        .hero-title {
+            font-size: 3.8rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: fadeInUp 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation-delay: 0.5s;
+        }
+
+        .hero-tagline {
+            font-size: 1rem;
+            color: var(--text-muted);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            opacity: 0;
+            animation: fadeInUp 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation-delay: 0.7s;
+        }
+
+        .hero-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: fadeInUp 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation-delay: 0.9s;
+        }
+
+        .hero-quote {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 45px;
+            opacity: 0;
+            animation: fadeInUp 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation-delay: 1.1s;
+        }
+
+        .hero-quote::before,
+        .hero-quote::after {
+            content: '"';
+            color: var(--accent-color);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero Buttons */
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeInUp 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation-delay: 1.3s;
+        }
+
+        .btn-primary {
+            padding: 16px 40px;
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: var(--accent-color);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn-primary:hover { color: var(--bg-color); }
+        .btn-primary:hover::before { left: 0; }
+
+        .btn-secondary {
+            padding: 16px 40px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ============================================
+           7. SECTIONS GENERAL
+           ============================================ */
+        .section {
+            padding: 120px 5%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-header {
+            margin-bottom: 70px;
+            text-align: center;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .section-label::before,
+        .section-label::after {
+            content: '';
+            width: 40px; height: 1px;
+            background: var(--border-color);
+        }
+
+        .section-title {
+            font-size: 2.8rem;
+            color: var(--accent-color);
+            letter-spacing: 2px;
+        }
+
+        /* ============================================
+           8. ABOUT SECTION
+           ============================================ */
+        .about-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-image-wrapper {
+            position: relative;
+        }
+
+        .about-image {
+            width: 100%;
+            max-width: 320px;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 8px;
+            filter: grayscale(100%);
+            transition: filter 0.6s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .about-image:hover { filter: grayscale(0%); }
+
+        .about-image-frame {
+            position: absolute;
+            top: 20px; left: 20px;
+            right: -20px; bottom: -20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            z-index: -1;
+        }
+
+        .about-content h3 {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .about-content .subtitle-accent {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .about-content p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .about-quote {
+            border-left: 2px solid var(--accent-color);
+            padding-left: 20px;
+            margin-top: 30px;
+            font-style: italic;
+            color: var(--text-color);
+        }
+
+        .about-quote strong {
+            display: block;
+            color: var(--accent-color);
+            font-style: normal;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        /* ============================================
+           9. SKILLS SECTION
+           ============================================ */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .skill-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            border-radius: 8px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .skill-card:hover::before { transform: scaleX(1); }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .skill-icon-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .skill-icon {
+            font-size: 1.3rem;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .skill-title {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .skill-percent {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .skill-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .progress-track {
+            width: 100%; height: 3px;
+            background: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 1.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* ============================================
+           10. PROJECTS SECTION
+           ============================================ */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-hover);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-thumbnail {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: filter 0.6s ease, transform 0.6s ease;
+        }
+
+        .project-card:hover .project-thumbnail {
+            filter: grayscale(0%);
+            transform: scale(1.05);
+        }
+
+        .project-thumbnail-wrapper {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .project-number {
+            position: absolute;
+            top: 15px; left: 15px;
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            opacity: 0.3;
+            letter-spacing: 2px;
+        }
+
+        .project-content {
+            padding: 30px;
+        }
+
+        .project-title {
+            font-size: 1.4rem;
+            color: var(--accent-color);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .project-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .tech-tag {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 20px;
+            letter-spacing: 1px;
+        }
+
+        .project-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .project-btn {
+            flex: 1;
+            padding: 10px 15px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .project-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+
+        .project-btn.primary {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+
+        .project-btn.primary:hover {
+            background: transparent;
+            color: var(--accent-color);
+        }
+
+        /* ============================================
+           11. COUNTDOWN TIMER
+           ============================================ */
+        .countdown-section {
+            text-align: center;
+            padding: 80px 5%;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .countdown-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            min-width: 90px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+        }
+
+        .countdown-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-shadow: 0 0 20px var(--accent-glow);
+            letter-spacing: 2px;
+        }
+
+        .countdown-unit {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        /* ============================================
+           12. ACCORDION SECTION
+           ============================================ */
+        .accordion-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .accordion-item {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            background: var(--card-bg);
+            transition: all 0.3s;
+        }
+
+        .accordion-item:hover { border-color: var(--border-hover); }
+
+        .accordion-header {
+            padding: 22px 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--accent-color);
+            font-size: 1rem;
+            letter-spacing: 1px;
+            transition: background 0.3s;
+        }
+
+        .accordion-header:hover { background: var(--card-hover); }
+
+        .accordion-icon {
+            font-size: 1.5rem;
+            transition: transform 0.4s ease;
+            color: var(--text-muted);
+        }
+
+        .accordion-item.active .accordion-icon { transform: rotate(45deg); }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .accordion-body {
+            padding: 0 30px 25px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* ============================================
+           13. CONTACT SECTION
+           ============================================ */
+        .contact-container {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .contact-title {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .contact-desc {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        .contact-email {
+            display: inline-block;
+            font-size: 1.3rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            padding: 15px 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 50px;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .contact-email:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            width: 55px; height: 55px;
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .social-link:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--accent-glow);
+        }
+
+        /* ============================================
+           14. FOOTER
+           ============================================ */
+        footer {
+            padding: 40px 5%;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .secret-text {
+            color: #333;
+            font-size: 0.75rem;
+            cursor: help;
+            transition: all 0.3s;
+            padding: 10px;
+            display: inline-block;
+            border: 1px dashed #333;
+            border-radius: 4px;
+        }
+
+        [data-theme="light"] .secret-text {
+            color: #ccc;
+            border-color: #ccc;
+        }
+
+        .secret-text:hover {
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* ============================================
+           15. VIDEO MODAL (EASTER EGG)
+           ============================================ */
+        .video-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.97);
+            z-index: 10001;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .video-modal.active { display: flex; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-video {
+            max-width: 90%;
+            max-height: 70vh;
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            box-shadow: 0 0 50px var(--accent-glow);
+        }
+
+        .modal-close {
+            margin-top: 25px;
+            padding: 12px 30px;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .modal-close:hover { box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* ============================================
+           16. SCROLL REVEAL
+           ============================================ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============================================
+           17. RESPONSIVE
+           ============================================ */
+        @media (max-width: 900px) {
+            .about-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .about-image-wrapper {
+                display: flex;
+                justify-content: center;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-title { font-size: 2.5rem; }
+            .section-title { font-size: 2rem; }
+            .contact-title { font-size: 2.2rem; }
+        }
+
+        @media (max-width: 768px) {
+            body { cursor: auto; }
+            .cursor-dot, .cursor-outline { display: none; }
+
+            .nav-links {
+                position: fixed;
+                top: 70px; right: -100%;
+                flex-direction: column;
+                background: var(--nav-bg);
+                backdrop-filter: blur(20px);
+                width: 70%;
+                height: calc(100vh - 70px);
+                padding: 40px 30px;
+                transition: right 0.4s ease;
+                border-left: 1px solid var(--border-color);
+                gap: 25px;
+                align-items: flex-start;
+            }
+
+            .nav-links.active { right: 0; }
+            .hamburger { display: flex; }
+
+            .hero-carousel { width: 180px; height: 180px; }
+            .hero-title { font-size: 2rem; letter-spacing: 1px; }
+            .hero-tagline { font-size: 0.8rem; letter-spacing: 2px; }
+            .hero-subtitle { font-size: 0.9rem; }
+
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .btn-primary, .btn-secondary { width: 100%; }
+
+            .section { padding: 80px 5%; }
+            .section-title { font-size: 1.8rem; }
+
+            .projects-grid { grid-template-columns: 1fr; }
+
+            .countdown-value { font-size: 1.8rem; }
+            .countdown-item { min-width: 70px; padding: 15px; }
+
+            .contact-email { font-size: 1rem; padding: 12px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PARTICLE CANVAS -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <!-- VIDEO MODAL (EASTER EGG) -->
+    <div class="video-modal" id="videoModal">
+        <video class="modal-video" id="easterEggVideo" src="https://files.catbox.moe/gxewtz.mp4" controls loop></video>
+        <button class="modal-close" id="modalCloseBtn">Tutup Sistem Error</button>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav>
+        <a href="#home" class="logo">RQ</a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="nav-controls">
+            <button class="theme-toggle" id="themeToggle">
+                <span id="themeIcon">☀</span>
+                <span id="themeText">Light</span>
+            </button>
+            <button class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero" id="home">
+        <div class="hero-carousel" id="heroCarousel">
+            <img src="https://i.ibb.co/Kp4dqCck/profil.jpg" class="carousel-img active" alt="Riyad">
+            <img src="https://i.ibb.co/20cqX0V6/Screenshot-2026-1024-200359.png" class="carousel-img" alt="AI Aesthetic">
+            <img src="https://i.ibb.co/Jj9vGWRy/IMG-20261030-094849-png.png" class="carousel-img" alt="Yamada">
+            <div class="carousel-indicators">
+                <span class="indicator active"></span>
+                <span class="indicator"></span>
+                <span class="indicator"></span>
+            </div>
+        </div>
+
+        <h1 class="hero-title" id="heroTitle">M. Riyadussolikhin</h1>
+        <p class="hero-tagline">Siswa · Pembelajar · Web Enthusiast</p>
+        <p class="hero-subtitle">Biasa dipanggil Riyad. Seorang siswa dan Frontend Developer yang berfokus merancang pengalaman web yang estetik, bersih, dan fungsional.</p>
+        <p class="hero-quote">Sedikit memiliki keinginan untuk memiliki pasangan hidup</p>
+
+        <div class="hero-buttons">
+            <button class="btn-primary magnetic-btn" id="btnViewWork">View My Work</button>
+            <button class="btn-secondary magnetic-btn" id="btnContact">Contact Me</button>
+        </div>
+
+        <div class="scroll-indicator">SCROLL ↓</div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="section" id="about">
+        <div class="section-header reveal">
+            <p class="section-label">01 — Tentang</p>
+            <h2 class="section-title">Tentang Saya</h2>
+        </div>
+
+        <div class="about-container">
+            <div class="about-image-wrapper reveal">
+                <img src="https://i.ibb.co/20cqX0V6/Screenshot-2026-1024-200359.png" alt="Aesthetic" class="about-image">
+                <div class="about-image-frame"></div>
+            </div>
+
+            <div class="about-content reveal">
+                <h3>Siswa & Logika</h3>
+                <p class="subtitle-accent">Matematika · Kimia · Coding</p>
+                <p>Sebagai siswa SMA dengan fokus pada Matematika dan Kimia, saya terbiasa berpikir logis dan sistematis. Saya memandang coding bukan sekadar menulis baris perintah, melainkan seni memecahkan masalah yang kompleks menjadi solusi yang elegan dan efisien.</p>
+                <p>Di tengah lingkungan sekolah yang dinamis, saya tumbuh sebagai pribadi yang mandiri, disiplin, dan selalu tertantang untuk keluar dari zona nyaman. Bagi saya, status sebagai pelajar adalah sebuah kesempatan emas untuk terus memacu diri dan melampaui standar yang ada.</p>
+
+                <div class="about-quote">
+                    <strong>"Belajar dari Mesin, Berkarya untuk Manusia"</strong>
+                    Memahami kecerdasan buatan bukan hanya tentang algoritma, tapi tentang bagaimana kita bisa menciptakan solusi yang lebih cerdas untuk kehidupan sehari-hari.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SKILLS SECTION -->
+    <section class="section" id="skills" style="background: var(--bg-secondary);">
+        <div class="section-header reveal">
+            <p class="section-label">02 — Eksplorasi</p>
+            <h2 class="section-title">Keahlian & Kompetensi</h2>
+        </div>
+
+        <div class="skills-grid">
+            <div class="skill-card reveal">
+                <div class="skill-header">
+                    <div class="skill-icon-title">
+                        <span class="skill-icon">&lt;/&gt;</span>
+                        <span class="skill-title">HTML5</span>
+                    </div>
+                    <span class="skill-percent">70%</span>
+                </div>
+                <p class="skill-desc">Struktur Web yang Semantik & Bersih. Memahami fondasi dasar web dengan penulisan kode yang rapi, terorganisir, dan mudah dibaca.</p>
+                <div class="progress-track"><div class="progress-fill" data-width="70"></div></div>
+            </div>
+
+            <div class="skill-card reveal">
+                <div class="skill-header">
+                    <div class="skill-icon-title">
+                        <span class="skill-icon">{ }</span>
+                        <span class="skill-title">CSS3</span>
+                    </div>
+                    <span class="skill-percent">80%</span>
+                </div>
+                <p class="skill-desc">Desain Responsif & Estetika Modern. Mampu menerjemahkan konsep menjadi tampilan visual yang menarik, termasuk animasi, transisi halus, dan implementasi tema Gelap/Terang.</p>
+                <div class="progress-track"><div class="progress-fill" data-width="80"></div></div>
+            </div>
+
+            <div class="skill-card reveal">
+                <div class="skill-header">
+                    <div class="skill-icon-title">
+                        <span class="skill-icon">JS</span>
+                        <span class="skill-title">JavaScript</span>
+                    </div>
+                    <span class="skill-percent">60%</span>
+                </div>
+                <p class="skill-desc">Interaktivitas & Logika Pemrograman. Mampu menambahkan fitur dinamis pada web, seperti manipulasi DOM, event listener, dan logika dasar untuk pengalaman pengguna yang lebih hidup.</p>
+                <div class="progress-track"><div class="progress-fill" data-width="60"></div></div>
+            </div>
+
+            <div class="skill-card reveal">
+                <div class="skill-header">
+                    <div class="skill-icon-title">
+                        <span class="skill-icon">⌘</span>
+                        <span class="skill-title">Git & GitHub</span>
+                    </div>
+                    <span class="skill-percent">65%</span>
+                </div>
+                <p class="skill-desc">Version Control & Workflow Profesional. Memahami alur kerja standar industri untuk menyimpan, melacak perubahan kode, dan mempublikasikan proyek secara aman.</p>
+                <div class="progress-track"><div class="progress-fill" data-width="65"></div></div>
+            </div>
+
+            <div class="skill-card reveal">
+                <div class="skill-header">
+                    <div class="skill-icon-title">
+                        <span class="skill-icon">∑</span>
+                        <span class="skill-title">Logical Thinking</span>
+                    </div>
+                    <span class="skill-percent">85%</span>
+                </div>
+                <p class="skill-desc">Pemecahan Masalah Berbasis Sains. Mengaplikasikan pola pikir analitis dari Matematika dan Kimia untuk mendeteksi bug, menganalisis masalah, dan merancang solusi kode yang efisien.</p>
+                <div class="progress-track"><div class="progress-fill" data-width="85"></div></div>
+            </div>
+
+            <div class="skill-card reveal">
+                <div class="skill-header">
+                    <div class="skill-icon-title">
+                        <span class="skill-icon">⚡</span>
+                        <span class="skill-title">Fast Learner</span>
+                    </div>
+                    <span class="skill-percent">90%</span>
+                </div>
+                <p class="skill-desc">Kemampuan Belajar Mandiri (Self-Taught). Terbukti mampu mempelajari dan mengimplementasikan konsep baru (seperti custom transitions, audio API, dan CSS filters) secara otodidak dengan cepat.</p>
+                <div class="progress-track"><div class="progress-fill" data-width="90"></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROJECTS SECTION -->
+    <section class="section" id="projects">
+        <div class="section-header reveal">
+            <p class="section-label">03 — Portofolio</p>
+            <h2 class="section-title">Proyek Saya</h2>
+        </div>
+
+        <div class="projects-grid">
+            <div class="project-card reveal">
+                <div class="project-thumbnail-wrapper">
+                    <span class="project-number">01</span>
+                    <img src="https://i.ibb.co/Jj9vGWRy/IMG-20261030-094849-png.png" alt="Noir Portfolio" class="project-thumbnail">
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">RQ Noir Interactive Portf""olio</h3>
+                    <p class="project-desc">Sebuah portofolio web personal bertema dark mode yang mengutamakan estetika minimalis dan pengalaman pengguna (UX) yang mulus. Dilengkapi dengan fitur interaktif seperti custom page transitions, integrasi audio, dan dynamic image filtering.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">HTML5</span>
+                        <span class="tech-tag">CSS3</span>
+                        <span class="tech-tag">JavaScript</span>
+                        <span class="tech-tag">Git</span>
+                    </div>
+                    <div class="project-buttons">
+                        <a href="#" class="project-btn primary">Live Demo</a>
+                        <a href="#" class="project-btn">Source Code</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card reveal">
+                <div class="project-thumbnail-wrapper">
+                    <span class="project-number">02</span>
+                    <img src="https://i.ibb.co/20cqX0V6/Screenshot-2026-1024-200359.png" alt="Proyeknoir" class="project-thumbnail">
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">Proyeknoir</h3>
+                    <p class="project-desc">Eksperimen tampilan web dengan estetika gelap dan tipografi bold. Fokus pada hierarki visual yang kuat dan pengalaman membaca yang nyaman di berbagai perangkat.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">HTML5</span>
+                        <span class="tech-tag">CSS3</span>
+                        <span class="tech-tag">Responsive</span>
+                    </div>
+                    <div class="project-buttons">
+                        <a href="#" class="project-btn primary">Live Demo</a>
+                        <a href="#" class="project-btn">Source Code</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card reveal">
+                <div class="project-thumbnail-wrapper">
+                    <span class="project-number">03</span>
+                    <img src="https://i.ibb.co/Fqd0DKPP/IMG-20261102-195121.png" alt="M.RS Portfolio" class="project-thumbnail">
+                </div>
+                <div class="project-content">
+                    <h3 class="project-title">M.RS Personal Site</h3>
+                    <p class="project-desc">Website personal pertama dengan struktur section yang lengkap: Tentang, Eksplorasi, dan Kontak. Dilengkapi dengan catatan kaki berisi kutipan filosofis sebagai sentuhan personal.</p>
+                    <div class="project-tech">
+                        <span class="tech-tag">HTML5</span>
+                        <span class="tech-tag">CSS3</span>
+                        <span class="tech-tag">JavaScript</span>
+                    </div>
+                    <div class="project-buttons">
+                        <a href="#" class="project-btn primary">Live Demo</a>
+                        <a href="#" class="project-btn">Source Code</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COUNTDOWN SECTION -->
+    <section class="countdown-section">
+        <p class="countdown-label reveal">Menuju Proyek Selanjutnya</p>
+        <div class="countdown-timer reveal" id="countdownTimer">
+            <div class="countdown-item">
+                <div class="countdown-value" id="cdDays">00</div>
+                <div class="countdown-unit">Hari</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-value" id="cdHours">00</div>
+                <div class="countdown-unit">Jam</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-value" id="cdMinutes">00</div>
+                <div class="countdown-unit">Menit</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-value" id="cdSeconds">00</div>
+                <div class="countdown-unit">Detik</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ACCORDION SECTION -->
+    <section class="section">
+        <div class="section-header reveal">
+            <p class="section-label">04 — Filosofi</p>
+            <h2 class="section-title">Catatan Kaki</h2>
+        </div>
+
+        <div class="accordion-container">
+            <div class="accordion-item reveal">
+                <div class="accordion-header">
+                    <span>Tentang Proses Belajar Saya</span>
+                    <span class="accordion-icon">+</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        Saya percaya bahwa belajar coding adalah perjalanan seumur hidup. Setiap error adalah guru, setiap bug adalah teka-teki yang menunggu untuk dipecahkan. Saya memulai dari nol, belajar otodidak, dan terus berkembang setiap hari.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item reveal">
+                <div class="accordion-header">
+                    <span>Filosofi Desain Noir</span>
+                    <span class="accordion-icon">+</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        Tema Noir bukan sekadar hitam dan putih. Ini adalah tentang kesederhanaan yang elegan, fokus pada konten, dan menghilangkan gangguan visual. Dalam kesederhanaan, terdapat keindahan yang abadi.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item reveal">
+                <div class="accordion-header">
+                    <span>Visi Masa Depan</span>
+                    <span class="accordion-icon">+</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        Saya bercita-cita menjadi Frontend Developer profesional yang mampu menciptakan pengalaman web yang tidak hanya indah secara visual, tetapi juga bermakna bagi penggunanya. Setiap proyek adalah langkah menuju visi tersebut.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item reveal">
+                <div class="accordion-header">
+                    <span>Kutipan Favorit</span>
+                    <span class="accordion-icon">+</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-body">
+                        <em>"Jangan menjadi pelayan bagi ekspektasi orang lain, karena pada akhirnya, kamu adalah sutradara dari usiamu sendiri."</em><br><br>
+                        <em>"Nasehat tanpa ilmu, hanyalah pelarian tanpa tujuan."</em>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="section" id="contact" style="background: var(--bg-secondary);">
+        <div class="contact-container reveal">
+            <p class="section-label" style="margin-bottom: 20px;">05 — Kontak</p>
+            <h2 class="contact-title">Mari Terhubung</h2>
+            <p class="contact-desc">Punya proyek menarik atau ingin berkolaborasi? Jangan ragu untuk menghubungi saya. Mari kita ciptakan sesuatu yang luar biasa bersama.</p>
+            
+            <a href="mailto:tumbalproyek@domain.com" class="contact-email">tumbalproyek@domain.com</a>
+
+            <div class="social-links">
+                <a href="#" class="social-link" title="Instagram">IG</a>
+                <a href="#" class="social-link" title="Twitter/X">X</a>
+                <a href="#" class="social-link" title="GitHub">GH</a>
+                <a href="#" class="social-link" title="LinkedIn">IN</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p class="footer-text">© 2026 M. Riyadussolikhin. All Rights Reserved. // Built with ❤️ and ☕</p>
+        <span class="secret-text" id="secretTrigger">[ SYSTEM_DIAGNOSTIC: CLICK TO VIEW LOG ]</span>
+    </footer>
+
+    <script>
+        /* ============================================
+           1. PARTICLE BACKGROUND SYSTEM
+           ============================================ */
+        const particleCanvas = document.getElementById('particleCanvas');
+        const particleCtx = particleCanvas.getContext('2d');
+        let particlesArray = [];
+        let animationId;
+
+        function resizeParticleCanvas() {
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+        }
+        resizeParticleCanvas();
+        window.addEventListener('resize', resizeParticleCanvas);
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * particleCanvas.width;
+                this.y = Math.random() * particleCanvas.height;
+                this.size = Math.random() * 1.5 + 0.3;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > particleCanvas.width) this.x = 0;
+                if (this.x < 0) this.x = particleCanvas.width;
+                if (this.y > particleCanvas.height) this.y = 0;
+                if (this.y < 0) this.y = particleCanvas.height;
+            }
+
+            draw() {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                particleCtx.fillStyle = isDark 
+                    ? `rgba(255, 255, 255, ${this.opacity})` 
+                    : `rgba(0, 0, 0, ${this.opacity * 0.5})`;
+                particleCtx.beginPath();
+                particleCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                particleCtx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            const numberOfParticles = Math.min((particleCanvas.width * particleCanvas.height) / 15000, 120);
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function connectParticles() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    const dx = particlesArray[a].x - particlesArray[b].x;
+                    const dy = particlesArray[a].y - particlesArray[b].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 120) {
+                        const opacity = (1 - distance / 120) * 0.15;
+                        particleCtx.strokeStyle = isDark 
+                            ? `rgba(255, 255, 255, ${opacity})` 
+                            : `rgba(0, 0, 0, ${opacity * 0.5})`;
+                        particleCtx.lineWidth = 0.5;
+                        particleCtx.beginPath();
+                        particleCtx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        particleCtx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        particleCtx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animateParticles() {
+            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            connectParticles();
+            animationId = requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        /* ============================================
+           2. CUSTOM CURSOR TRAIL (LERP)
+           ============================================ */
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        let mouseX = 0, mouseY = 0;
+        let outlineX = 0, outlineY = 0;
+
+        if (window.matchMedia("(pointer: fine)").matches) {
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                cursorDot.style.left = `${mouseX}px`;
+                cursorDot.style.top = `${mouseY}px`;
+            });
+
+            function animateCursor() {
+                const distX = mouseX - outlineX;
+                const distY = mouseY - outlineY;
+                outlineX += distX * 0.15;
+                outlineY += distY * 0.15;
+                cursorOutline.style.left = `${outlineX}px`;
+                cursorOutline.style.top = `${outlineY}px`;
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+
+            const interactables = document.querySelectorAll('a, button, .skill-card, .project-card, .accordion-header');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursorOutline.style.width = '60px';
+                    cursorOutline.style.height = '60px';
+                    cursorOutline.style.borderColor = 'var(--accent-color)';
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursorOutline.style.width = '36px';
+                    cursorOutline.style.height = '36px';
+                    cursorOutline.style.borderColor = 'var(--text-muted)';
+                });
+            });
+        }
+
+        /* ============================================
+           3. DARK / LIGHT MODE
+           ============================================ */
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        const html = document.documentElement;
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            themeIcon.textContent = newTheme === 'dark' ? '☀' : '☾';
+            themeText.textContent = newTheme === 'dark' ? 'Light' : 'Dark';
+        });
+
+        /* ============================================
+           4. HAMBURGER MENU
+           ============================================ */
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
+
+        /* ============================================
+           5. IMAGE CAROUSEL
+           ============================================ */
+        const carouselImages = document.querySelectorAll('.carousel-img');
+        const indicators = document.querySelectorAll('.indicator');
+        let currentImageIndex = 0;
+
+        function changeCarouselImage() {
+            carouselImages[currentImageIndex].classList.remove('active');
+            indicators[currentImageIndex].classList.remove('active');
+            currentImageIndex = (currentImageIndex + 1) % carouselImages.length;
+            carouselImages[currentImageIndex].classList.add('active');
+            indicators[currentImageIndex].classList.add('active');
+        }
+
+        setInterval(changeCarouselImage, 3500);
+
+        /* ============================================
+           6. TEXT REVEAL EFFECT (Hero Title)
+           ============================================ */
+        const heroTitle = document.getElementById('heroTitle');
+        const originalTitle = heroTitle.textContent;
+        const scrambleChars = '!<>-_\\/[]{}—=+*^?#________';
+
+        function scrambleText(element, finalText, duration = 1500) {
+            const startTime = Date.now();
+            const interval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                let output = '';
+                
+                for (let i = 0; i < finalText.length; i++) {
+                    if (finalText[i] === ' ') {
+                        output += ' ';
+                    } else if (i / finalText.length < progress) {
+                        output += finalText[i];
+                    } else {
+                        output += scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+                    }
+                }
+                
+                element.textContent = output;
+                
+                if (progress >= 1) {
+                    clearInterval(interval);
+                    element.textContent = finalText;
+                }
+            }, 50);
+        }
+
+        setTimeout(() => scrambleText(heroTitle, originalTitle, 2000), 800);
+
+        /* ============================================
+           7. MAGNETIC BUTTON EFFECT
+           ============================================ */
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transition = 'transform 0.3s ease';
+                btn.style.transform = 'translate(0px, 0px)';
+                setTimeout(() => btn.style.transition = '', 300);
+            });
+        });
+
+        /* ============================================
+           8. SMOOTH SCROLL BUTTONS
+           ============================================ */
+        document.getElementById('btnViewWork').addEventListener('click', () => {
+            document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        document.getElementById('btnContact').addEventListener('click', () => {
+            document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        /* ============================================
+           9. SCROLL REVEAL & PROGRESS BAR
+           ============================================ */
+        const revealElements = document.querySelectorAll('.reveal');
+        const progressBars = document.querySelectorAll('.progress-fill');
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    
+                    if (entry.target.classList.contains('progress-fill')) {
+                        const targetWidth = entry.target.getAttribute('data-width');
+                        setTimeout(() => {
+                            entry.target.style.width = `${targetWidth}%`;
+                        }, 200);
+                    }
+                }
+            });
+        }, { threshold: 0.15 });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+        progressBars.forEach(el => revealObserver.observe(el));
+
+        /* ============================================
+           10. 3D TILT EFFECT ON PROJECT CARDS
+           ============================================ */
+        const tiltCards = document.querySelectorAll('.project-card, .skill-card');
+        tiltCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -5;
+                const rotateY = ((x - centerX) / centerX) * 5;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+            });
+        });
+
+        /* ============================================
+           11. NEON COUNTDOWN TIMER
+           ============================================ */
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + 30); // 30 hari dari sekarang
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = targetDate - now;
+
+            if (diff <= 0) return;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
+            document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('cdMinutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('cdSeconds').textContent = String(seconds).padStart(2, '0');
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        /* ============================================
+           12. SMOOTH ACCORDION
+           ============================================ */
+        const accordionItems = document.querySelectorAll('.accordion-item');
+        accordionItems.forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            const content = item.querySelector('.accordion-content');
+
+            header.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                
+                // Tutup semua accordion
+                accordionItems.forEach(otherItem => {
+                    otherItem.classList.remove('active');
+                    otherItem.querySelector('.accordion-content').style.maxHeight = null;
+                });
+
+                // Buka yang diklik jika belum aktif
+                if (!isActive) {
+                    item.classList.add('active');
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                }
+            });
+        });
+
+        /* ============================================
+           13. EASTER EGG VIDEO MODAL
+           ============================================ */
+        const videoModal = document.getElementById('videoModal');
+        const easterEggVideo = document.getElementById('easterEggVideo');
+        const secretTrigger = document.getElementById('secretTrigger');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+        secretTrigger.addEventListener('click', () => {
+            videoModal.classList.add('active');
+            easterEggVideo.play();
+        });
+
+        modalCloseBtn.addEventListener('click', () => {
+            easterEggVideo.pause();
+            easterEggVideo.currentTime = 0;
+            videoModal.classList.remove('active');
+        });
+
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) {
+                easterEggVideo.pause();
+                easterEggVideo.currentTime = 0;
+                videoModal.classList.remove('active');
+            }
+        });
+
+        /* ============================================
+           14. NAVBAR SCROLL EFFECT
+           ============================================ */
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            const nav = document.querySelector('nav');
+            
+            if (currentScroll > 100) {
+                nav.style.padding = '12px 5%';
+                nav.style.boxShadow = '0 5px 30px rgba(0,0,0,0.3)';
+            } else {
+                nav.style.padding = '18px 5%';
+                nav.style.boxShadow = 'none';
+            }
+            
+            lastScroll = currentScroll;
+        });
+
+        /* ============================================
+           15. CONSOLE EASTER EGG
+           ============================================ */
+        console.log('%c🖤 RQ Noir Portfolio', 'font-size: 24px; font-weight: bold; color: #fff; background: #000; padding: 10px 20px;');
+        console.log('%cDibuat dengan ❤️ oleh M. Riyadussolikhin', 'font-size: 14px; color: #888;');
+        console.log('%c🐈 [ SYSTEM_DIAGNOSTIC: Easter Egg aktif di footer ]', 'font-size: 12px; color: #00e5ff;');
+    </script>
+</body>
+</html>
